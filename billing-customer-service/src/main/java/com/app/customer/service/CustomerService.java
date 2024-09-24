@@ -4,7 +4,9 @@ import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +20,20 @@ public class CustomerService {
 	@Autowired
 	CustomerRepository customerRepo;
 
-	public ResponseEntity<CustomerEntity> createCustomer(CustomerDto customerDto) {
+	@SuppressWarnings("unchecked")
+	public <T> ResponseEntity<T> createCustomer(CustomerDto customerDto) {
 		CustomerEntity customerEntity = new CustomerEntity(customerDto.getFirstName()
 				,customerDto.getLastName(), customerDto.getEmail(), customerDto.getMobileNo()
 				,customerDto.getAddressLine(), customerDto.getCity(), customerDto.getState()
 				, customerDto.getCountry(), customerDto.getPostelCode(), new Date(), new Date());
-		customerEntity = customerRepo.save(customerEntity);
-		return new ResponseEntity<>(customerEntity, HttpStatus.CREATED);
+		try {
+			customerEntity = customerRepo.save(customerEntity);
+		} catch (DataIntegrityViolationException e) {
+			return (ResponseEntity<T>) new ResponseEntity<String>("Duplicate entry for EMAIL or Mobile", 
+					HttpStatusCode.valueOf(500));
+		}
+		
+		return (ResponseEntity<T>) new ResponseEntity<>(customerEntity, HttpStatus.CREATED);
 		
 	}
 
