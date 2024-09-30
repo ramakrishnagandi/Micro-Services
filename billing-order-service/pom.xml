@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.app.billing</groupId>
-	<artifactId>billing-order-service</artifactId>
+	<artifactId>order-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>billing-order-service</name>
+	<name>order-service</name>
 	<description>Billing-Service-Registry</description>
 	<url/>
 	<licenses>

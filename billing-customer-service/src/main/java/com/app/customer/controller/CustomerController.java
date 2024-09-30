@@ -1,5 +1,7 @@
 package com.app.customer.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +27,7 @@ public class CustomerController {
 	CustomerService customerService;
 	
 	@PostMapping("create")
-	public ResponseEntity<CustomerEntity> createCustomer(@RequestBody CustomerDto customerDto) {
+	public ResponseEntity<CustomerDto> createCustomer(@RequestBody CustomerDto customerDto) {
 		return customerService.createCustomer(customerDto);		
 	}
 	
@@ -34,10 +36,20 @@ public class CustomerController {
 		return customerService.getCustomer(id);
 	}
 	
+	@GetMapping("get/customers") 
+	public ResponseEntity<List<CustomerDto>> getCustomers() {
+		return customerService.getCustomers();
+	}
+	
 	
 	@DeleteMapping("delete/{id}")
-	public ResponseEntity<String> deleteCustomer(@PathVariable Long id){
+	public ResponseEntity<String> deleteCustomer(@PathVariable Long id) {
 		return customerService.deleteCustomer(id);
 	}
+	
+	 @GetMapping("search-by-mobile/{mobile}")
+	 public ResponseEntity<CustomerDto> getCustomerByMobileNumber(@PathVariable String mobile){
+		 return customerService.getCustomerByMobileNumber(mobile);
+	 }
 
 }

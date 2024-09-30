@@ -6,4 +6,6 @@ import com.app.customer.entity.CustomerEntity;
 
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> {
 
+	CustomerEntity findByMobileNo(String mobileNumber);
+
 }
