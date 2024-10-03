@@ -41,7 +41,7 @@ public class OrderController {
 	}
 	
 	@PostMapping("/filter")
-    public ResponseEntity<List<OrderCustomerResponseDTO>> filterOrders(@RequestBody OrderFilterDTO filter,
+    public Page<OrderCustomerResponseDTO> filterOrders(@RequestBody OrderFilterDTO filter,
                                                        @RequestParam int page,
                                                        @RequestParam int size) {
         return orderService.getOrdersWithCustomerDetails(filter, page, size);

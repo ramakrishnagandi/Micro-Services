@@ -3,6 +3,7 @@ package com.app.order.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -95,7 +96,7 @@ public class OrderService {
 		return new ResponseEntity<List<OrderDto>>(ordersDto, HttpStatus.OK);
 	}
 	
-	public ResponseEntity<List<OrderCustomerResponseDTO>> getOrdersWithCustomerDetails(OrderFilterDTO filter, int page, int size) {
+	public Page<OrderCustomerResponseDTO> getOrdersWithCustomerDetails(OrderFilterDTO filter, int page, int size) {
 		CustomerDto cutomerDto = null;
 		if(StringUtils.hasLength(filter.getMobileNumber())) {
 			cutomerDto = customerFeignService.getCustomerByMobileNumber(filter.getMobileNumber()).getBody();
@@ -106,12 +107,12 @@ public class OrderService {
 		
 		Page<OrderEntity> ordersPage = orderRepo.findAll(specification, PageRequest.of(page, size));
 		
-		List<OrderCustomerResponseDTO> result = ordersPage.map(order -> {
+		List<OrderCustomerResponseDTO> responseDTOList = ordersPage.getContent().stream().map(order -> {
 			CustomerDto cutomerDto2 = customerFeignService.getCustomer(order.getCustomerId()).getBody();
             return new OrderCustomerResponseDTO(order, cutomerDto2);
-        }).getContent();
+        }).collect(Collectors.toList());
 		
-		return new ResponseEntity<List<OrderCustomerResponseDTO>>(result, HttpStatus.OK);
+		return new PageImpl<>(responseDTOList, PageRequest.of(page, size), ordersPage.getTotalElements());
 		
 	}
 }

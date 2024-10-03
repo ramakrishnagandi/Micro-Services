@@ -18,29 +18,30 @@ import com.app.customer.repo.CustomerRepository;
 
 @Service
 public class CustomerService {
-	
+
 	@Autowired
 	CustomerRepository customerRepo;
 
-	@SuppressWarnings("unchecked")
-	public <T> ResponseEntity<T> createCustomer(CustomerDto customerDto) {
-		CustomerEntity entity = new CustomerEntity(customerDto.getFirstName()
-				,customerDto.getLastName(), customerDto.getEmail(), customerDto.getMobileNo()
-				,customerDto.getAddressLine(), customerDto.getCity(), customerDto.getState()
-				, customerDto.getCountry(), customerDto.getPostelCode(), new Date(), new Date());
-		try {
-			entity = customerRepo.save(entity);
-			customerDto = new CustomerDto(entity.getCustomerId(), entity.getFirstName(), entity.getLastName(), 
-					entity.getEmail(), entity.getMobileNo(),
-					entity.getAddressLine(), entity.getCity(), 
-					entity.getState(), entity.getCountry(), entity.getPostelCode());
-		} catch (DataIntegrityViolationException e) {
-			return (ResponseEntity<T>) new ResponseEntity<String>("Duplicate entry for EMAIL or Mobile", 
-					HttpStatusCode.valueOf(500));
+	public ResponseEntity<CustomerDto> createCustomer(CustomerDto customerDto) {
+		CustomerEntity c = customerRepo.findByMobileNo(customerDto.getMobileNo());
+		
+		if (c != null) {
+			customerDto = new CustomerDto();
+			customerDto.setError("Duplicate entry for EMAIL or Mobile");
+			return new ResponseEntity<CustomerDto>(customerDto, HttpStatus.ALREADY_REPORTED);
 		}
 		
-		return (ResponseEntity<T>) new ResponseEntity<>(customerDto, HttpStatus.CREATED);
+		CustomerEntity entity = new CustomerEntity(customerDto.getFirstName(), customerDto.getLastName(),
+				customerDto.getEmail(), customerDto.getMobileNo(), customerDto.getAddressLine(), customerDto.getCity(),
+				customerDto.getState(), customerDto.getCountry(), customerDto.getPostelCode(), new Date(), new Date());
+		entity = customerRepo.save(entity);
 		
+		customerDto = new CustomerDto(entity.getCustomerId(), entity.getFirstName(), entity.getLastName(),
+				entity.getEmail(), entity.getMobileNo(), entity.getAddressLine(), entity.getCity(), entity.getState(),
+				entity.getCountry(), entity.getPostelCode(), null);
+
+		return new ResponseEntity<CustomerDto>(customerDto, HttpStatus.CREATED);
+
 	}
 
 	public ResponseEntity<String> deleteCustomer(Long id) {
@@ -50,12 +51,11 @@ public class CustomerService {
 
 	public ResponseEntity<CustomerDto> getCustomer(Long id) {
 		Optional<CustomerEntity> customerEntity = customerRepo.findById(id);
-		if(customerEntity.isPresent()) {
+		if (customerEntity.isPresent()) {
 			CustomerEntity entity = customerEntity.get();
-			CustomerDto dto = new CustomerDto(entity.getCustomerId(), entity.getFirstName(), entity.getLastName(), 
-					entity.getEmail(), entity.getMobileNo(),
-					entity.getAddressLine(), entity.getCity(), 
-					entity.getState(), entity.getCountry(), entity.getPostelCode());
+			CustomerDto dto = new CustomerDto(entity.getCustomerId(), entity.getFirstName(), entity.getLastName(),
+					entity.getEmail(), entity.getMobileNo(), entity.getAddressLine(), entity.getCity(),
+					entity.getState(), entity.getCountry(), entity.getPostelCode(), null);
 			return new ResponseEntity<CustomerDto>(dto, HttpStatus.OK);
 		}
 		return null;
@@ -64,24 +64,22 @@ public class CustomerService {
 	public ResponseEntity<List<CustomerDto>> getCustomers() {
 		List<CustomerDto> customersDto = new ArrayList<CustomerDto>();
 		List<CustomerEntity> customers = customerRepo.findAll();
-		
-		for(CustomerEntity entity:customers) {
-			CustomerDto dto = new CustomerDto(entity.getCustomerId(), entity.getFirstName(), entity.getLastName(), 
-					entity.getEmail(), entity.getMobileNo(),
-					entity.getAddressLine(), entity.getCity(), 
-					entity.getState(), entity.getCountry(), entity.getPostelCode());
+
+		for (CustomerEntity entity : customers) {
+			CustomerDto dto = new CustomerDto(entity.getCustomerId(), entity.getFirstName(), entity.getLastName(),
+					entity.getEmail(), entity.getMobileNo(), entity.getAddressLine(), entity.getCity(),
+					entity.getState(), entity.getCountry(), entity.getPostelCode(), null);
 			customersDto.add(dto);
 		}
-		
+
 		return new ResponseEntity<List<CustomerDto>>(customersDto, HttpStatusCode.valueOf(200));
 	}
 
 	public ResponseEntity<CustomerDto> getCustomerByMobileNumber(String mobileNumber) {
 		CustomerEntity entity = customerRepo.findByMobileNo(mobileNumber);
-		CustomerDto dto = new CustomerDto(entity.getCustomerId(), entity.getFirstName(), entity.getLastName(), 
-				entity.getEmail(), entity.getMobileNo(),
-				entity.getAddressLine(), entity.getCity(), 
-				entity.getState(), entity.getCountry(), entity.getPostelCode());
+		CustomerDto dto = new CustomerDto(entity.getCustomerId(), entity.getFirstName(), entity.getLastName(),
+				entity.getEmail(), entity.getMobileNo(), entity.getAddressLine(), entity.getCity(), entity.getState(),
+				entity.getCountry(), entity.getPostelCode(), null);
 		return new ResponseEntity<CustomerDto>(dto, HttpStatus.OK);
 	}
 

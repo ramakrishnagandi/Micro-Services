@@ -1,5 +1,8 @@
 package com.app.customer.dto;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class CustomerDto {
 	
 	private Long customerId;
@@ -12,9 +15,10 @@ public class CustomerDto {
 	private String state;
 	private String country;
 	private String postelCode;
+	private String error;
 	
 	public CustomerDto(Long customerId, String firstName, String lastName, String email, String mobileNo,
-			String addressLine, String city, String state, String country, String postelCode) {
+			String addressLine, String city, String state, String country, String postelCode, String error) {
 		super();
 		this.customerId = customerId;
 		this.firstName = firstName;
@@ -26,6 +30,7 @@ public class CustomerDto {
 		this.state = state;
 		this.country = country;
 		this.postelCode = postelCode;
+		this.error = error;
 	}
 
 	public Long getCustomerId() {
@@ -106,6 +111,14 @@ public class CustomerDto {
 
 	public void setPostelCode(String postelCode) {
 		this.postelCode = postelCode;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
 	}
 
 }
